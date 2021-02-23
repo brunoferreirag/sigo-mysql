@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/component: mongodb
 type: Opaque
 data:
-  mysql-root-password: ug$K6dyj)i3xFPP<B
+  mysql-root-password: davxDOt67J9O
 ---
 apiVersion: v1
 kind: Service
