@@ -28,7 +28,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: postgres-pv-claim
+  name: postgres
   labels:
     app: postgres
 spec:
@@ -42,7 +42,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres-demo
+  name: postgres
 spec:
   serviceName: "postgres"
   replicas: 1
@@ -59,14 +59,14 @@ spec:
         image: postgres:latest
         envFrom:
           - configMapRef:
-              name: postgres-config-demo
+              name: postgres
         ports:
         - containerPort: 5432
-          name: postgredb
+          name: postgres
         volumeMounts:
-        - name: postgres-pv-claim
+        - name: postgres
           mountPath: /var/lib/postgresql/data
           persistentVolumeClaim:
-            claimName: postgres-pv-claim
+            claimName: postgres
 
 ---
