@@ -6,7 +6,7 @@ metadata:
   labels:
     app: postgres
 type: Opaque
-data:
+stringData:
   POSTGRES_DB: demopostgresdb
   POSTGRES_USER: demopostgresadmin
   POSTGRES_PASSWORD: demopostgrespwd
