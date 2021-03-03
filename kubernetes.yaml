@@ -23,22 +23,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: postgres-pv-volume
-  labels:
-    type: local
-    app: postgres
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/mnt/data"
 
 ---
 
