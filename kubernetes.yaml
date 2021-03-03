@@ -1,77 +1,195 @@
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: postgres-pv
+ metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/gce-pd
+    volume.kubernetes.io/selected-node: gke-us-central1-cloud-okteto-com-dev-df949198-1n1r
+  creationTimestamp: "2021-03-03T20:20:40Z"
+  finalizers:
+  - kubernetes.io/pvc-protection
   labels:
-    app: postgres
-    type: local
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/var/data"
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: postgres-pv-claim
-  labels:
-    app: postgres
+    app: postgresql
+    release: postgresql
+    role: master
+  name: data-postgresql-0
+  namespace: brunoferreirag
+  resourceVersion: "331766902"
+  selfLink: /api/v1/namespaces/brunoferreirag/persistentvolumeclaims/data-postgresql-0
+  uid: c0aea81a-80a4-447a-a403-e88b590f19e8
 spec:
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-configuration
-  labels:
-    app: postgres
-data:
-  POSTGRES_DB: awesomedb
-  POSTGRES_USER: amazinguser
-  POSTGRES_PASSWORD: perfectpassword
+      storage: 2Gi
+  storageClassName: okteto
+  volumeMode: Filesystem
+  volumeName: pvc-c0aea81a-80a4-447a-a403-e88b590f19e8
+status:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  phase: Bound
  ---
- 
- apiVersion: apps/v1
-kind: StatefulSet
 metadata:
-  name: postgres-statefulset
+  annotations:
+    dev.okteto.com/last-updated: 2021-03-03T20:20:40
+    meta.helm.sh/release-name: postgresql
+    meta.helm.sh/release-namespace: brunoferreirag
+  creationTimestamp: "2021-03-03T20:20:40Z"
+  generation: 1
   labels:
-    app: postgres
+    app: postgresql
+    app.kubernetes.io/managed-by: Helm
+    chart: postgresql-6.3.12
+    heritage: Helm
+    release: postgresql
+  name: postgresql
+  namespace: brunoferreirag
+  resourceVersion: "331767159"
+  selfLink: /apis/apps/v1/namespaces/brunoferreirag/statefulsets/postgresql
+  uid: 5c779082-d5f3-498f-8864-7dfafd97350f
 spec:
-  serviceName: "postgres"
+  podManagementPolicy: OrderedReady
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: postgres
+      app: postgresql
+      release: postgresql
+      role: master
+  serviceName: postgresql-headless
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: postgres
+        app: postgresql
+        chart: postgresql-6.3.12
+        heritage: Helm
+        release: postgresql
+        role: master
+      name: postgresql
     spec:
       containers:
-      - name: postgres
-        image: postgres:12
-        envFrom:
-        - configMapRef:
-            name: postgres-configuration
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: POSTGRESQL_PORT_NUMBER
+          value: "5432"
+        - name: POSTGRESQL_VOLUME_DIR
+          value: /bitnami/postgresql
+        - name: PGDATA
+          value: /bitnami/postgresql/data
+        - name: POSTGRES_USER
+          value: okteto
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-password
+              name: postgresql
+        - name: POSTGRES_DB
+          value: okteto
+        image: docker.io/bitnami/postgresql:11.5.0-debian-9-r60
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - exec pg_isready -U "okteto" -d "okteto" -h 127.0.0.1 -p 5432
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: postgresql
         ports:
         - containerPort: 5432
-          name: postgresdb
+          name: postgresql
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - -e
+            - |
+              pg_isready -U "okteto" -d "okteto" -h 127.0.0.1 -p 5432
+              [ -f /opt/bitnami/postgresql/tmp/.initialized ]
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          runAsUser: 1001
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         volumeMounts:
-        - name: pv-data
-          mountPath: /var/lib/postgresql/data
-      volumes:
-      - name: pv-data
-        persistentVolumeClaim:
-          claimName: postgres-pv-claim
+        - mountPath: /bitnami/postgresql
+          name: data
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          mkdir -p /bitnami/postgresql/data
+          chmod 700 /bitnami/postgresql/data
+          find /bitnami/postgresql -mindepth 0 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | \
+            xargs chown -R 1001:1001
+        image: docker.io/bitnami/minideb:stretch
+        imagePullPolicy: Always
+        name: init-chmod-data
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /bitnami/postgresql
+          name: data
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+status:
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: postgresql-6bcd674f85
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: postgresql-6bcd674f85
+  updatedReplicas: 1
   ---
+  
   apiVersion: v1
 kind: Service
 metadata:
