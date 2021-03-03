@@ -9,6 +9,22 @@ data:
   POSTGRES_USER: u04qd9ani7e7m1cv
   POSTGRES_PASSWORD: y09TlqtzONShszmaVtCK
 ---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -23,53 +39,47 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: v1
-kind: Service
+
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
-  name: postgres-service
-  labels:
-    app: postgres
+  name: postgres
 spec:
-  ports:
-  - port: 5432
-    name: postgres
-  type: NodePort 
-  selector:
-    app: postgres
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: postgres-statefulset
-  labels:
-    app: postgres
-spec:
-  serviceName: "postgres"
   replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
   template:
     metadata:
       labels:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:12
-        envFrom:
-        - configMapRef:
-            name: postgres-configuration
-        ports:
-        - containerPort: 5432
-          name: postgresdb
-        volumeMounts:
-        - name: pv-data
-          mountPath: /var/lib/postgresql/data
+        - name: postgres
+          image: postgres:10.4
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
       volumes:
-      - name: pv-data
-        persistentVolumeClaim:
-          claimName: postgres-pv-claim
-
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+ ---          
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+   - port: 5432
+  selector:
+   app: postgres
 ---
+
 
