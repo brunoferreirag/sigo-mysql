@@ -9,7 +9,6 @@ data:
   POSTGRES_USER: u04qd9ani7e7m1cv
   POSTGRES_PASSWORD: y09TlqtzONShszmaVtCK
 ---
-
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -17,10 +16,9 @@ metadata:
   labels:
     app: postgres
 spec:
-  capacity: 1G
   storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
