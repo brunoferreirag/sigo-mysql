@@ -57,9 +57,9 @@ spec:
       containers:
       - name: postgres
         image: postgres:latest
-        envFrom:
-          - configMapRef:
-              name: postgres
+        env:
+          - name: POSTGRES_DB
+            value: demopostgresdb
         ports:
         - containerPort: 5432
           name: postgres
