@@ -25,7 +25,20 @@ spec:
   selector:
     app: postgres
 ---
-
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+ ---    
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -51,16 +64,9 @@ spec:
         - containerPort: 5432
           name: postgredb
         volumeMounts:
-        - name: postgredb
+        - name: postgres-pv-claim
           mountPath: /var/lib/postgresql/data
-          subPath: postgres
-  volumeClaimTemplates:
-  - metadata:
-      name: postgredb
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: gp2
-      resources:
-        requests:
-          storage: 3Gi
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+
 ---
