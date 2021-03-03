@@ -33,7 +33,7 @@ spec:
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432
-          envFrom:
+          env:
             -  POSTGRES_DB: postgresdb
             -  POSTGRES_USER: postgresadmin
             -  POSTGRES_PASSWORD: admin123
