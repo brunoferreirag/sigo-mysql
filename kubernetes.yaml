@@ -34,9 +34,12 @@ spec:
           ports:
             - containerPort: 5432
           env:
-            -  POSTGRES_DB: postgresdb
-            -  POSTGRES_USER: postgresadmin
-            -  POSTGRES_PASSWORD: admin123
+            -  name: POSTGRES_DB 
+               value: postgresdb
+            -  name: POSTGRES_USER 
+               value: postgresadmin
+            -  name: POSTGRES_PASSWORD 
+               value: admin123
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb
