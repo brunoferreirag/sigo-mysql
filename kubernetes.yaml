@@ -17,7 +17,8 @@ metadata:
   labels:
     app: postgres
 spec:
-  capacity:
+  capacity: 1G
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
