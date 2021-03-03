@@ -1,30 +1,30 @@
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: postgres-pv-claim
-  labels:
-    app: postgres
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
- ---          
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1beta1
+kind: Deployment
 metadata:
   name: postgres
-  labels:
-    app: postgres
 spec:
-  type: NodePort
-  ports:
-   - port: 5432
-  selector:
-   app: postgres
----
-
-
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:10.1
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: db0
+            - name: POSTGRES_USER
+              value: mendix
+            - name: POSTGRES_PASSWORD
+              value: mendix
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: "mendix-pgdata"
+      volumes:
+        - hostPath:
+            path: "/home/docker/pgdata"
+          name: mendix-pgdata
