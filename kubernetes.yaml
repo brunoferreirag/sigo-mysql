@@ -9,6 +9,15 @@ data:
   POSTGRES_USER: u04qd9ani7e7m1cv
   POSTGRES_PASSWORD: y09TlqtzONShszmaVtCK
 ---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: microk8s-hostpath
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: microk8s.io/hostpath
+---
+
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
