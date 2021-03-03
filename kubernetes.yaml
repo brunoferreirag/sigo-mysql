@@ -10,14 +10,6 @@ data:
   POSTGRES_DB: demopostgresdb
   POSTGRES_USER: demopostgresadmin
   POSTGRES_PASSWORD: demopostgrespwd
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-config-demo
-  labels:
-    app: postgres
-data:
-  
 ---  
 apiVersion: v1
 kind: Service
