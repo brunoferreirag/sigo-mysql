@@ -1,24 +1,37 @@
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: postgres-pv-claim
+  name: postgres-config-demo
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: demopostgresdb
+  POSTGRES_USER: demopostgresadmin
+  POSTGRES_PASSWORD: demopostgrespwd
+---  
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
   labels:
     app: postgres
 spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
----  
+  ports:
+  - port: 5432
+    name: postgres
+  clusterIP: None
+  selector:
+    app: postgres
+---
+
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: postgres
+  name: postgres-demo
 spec:
-  replicas: 1
+  serviceName: "postgres"
+  replicas: 2
   selector:
     matchLabels:
       app: postgres
@@ -27,39 +40,26 @@ spec:
       labels:
         app: postgres
     spec:
-      nodeSelector:
-          "beta.kubernetes.io/os": linux
       containers:
-        - name: postgres
-          image: postgres:10.4
-          imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 5432
-          env:
-            -  name: POSTGRES_DB 
-               value: postgresdb
-            -  name: POSTGRES_USER 
-               value: postgresadmin
-            -  name: POSTGRES_PASSWORD 
-               value: admin123
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgredb
-      volumes:
+      - name: postgres
+        image: postgres:latest
+        envFrom:
+          - configMapRef:
+              name: postgres-config-demo
+        ports:
+        - containerPort: 5432
+          name: postgredb
+        volumeMounts:
         - name: postgredb
-          persistentVolumeClaim:
-            claimName: postgres-pv-claim
----             
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  labels:
-    app: postgres
-spec:
-  type: NodePort
-  ports:
-   - port: 5432
-  selector:
-   app: postgres
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: postgredb
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 3Gi
+---
