@@ -9,6 +9,21 @@ data:
   POSTGRES_USER: u04qd9ani7e7m1cv
   POSTGRES_PASSWORD: y09TlqtzONShszmaVtCK
 ---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -24,20 +39,7 @@ spec:
     - ReadWriteMany
   hostPath:
     path: "/mnt/data"
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: postgres-pv-claim
-  labels:
-    app: postgres
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
+
 ---
 
 apiVersion: extensions/v1beta1
