@@ -1,15 +1,3 @@
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres
-  labels:
-    app: postgres
-type: Opaque
-stringData:
-  POSTGRES_DB: demopostgresdb
-  POSTGRES_USER: demopostgresadmin
-  POSTGRES_PASSWORD: demopostgrespwd
 ---  
 apiVersion: v1
 kind: Service
