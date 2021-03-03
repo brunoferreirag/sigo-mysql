@@ -14,7 +14,7 @@ spec:
       storage: 1Gi
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: postgres-configuration
   labels:
