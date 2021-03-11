@@ -32,8 +32,6 @@ metadata:
 spec:
   type: ExternalName
   externalName: mysql-externo-brunoferreirag.cloud.okteto.net
-  ports:
-    - port: 3306
   selector:                       
     app: mysql
 ---
