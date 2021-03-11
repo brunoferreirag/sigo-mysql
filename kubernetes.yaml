@@ -8,7 +8,7 @@ data:
   user: dTA0cWQ5YW5pN2U3bTFjdg==
   password: eTA5VGxxdHpPTlNoc3ptYVZ0Q0s=
   root-password: TSNARXN3UFB2QUBp
-  database: dXN1YXJpb3M=
+  database: c2lnb19zZWd1cmFuY2E=
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim        
