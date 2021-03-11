@@ -30,10 +30,9 @@ metadata:
   labels:                         
     app: mysql
 spec:
-  type: ExternalName
-  externalName: mysql-externo-brunoferreirag.cloud.okteto.net
+  type: LoadBalancer
   ports:
-    - port: 80
+    - port: 3306
   selector:                       
     app: mysql
 ---
@@ -79,7 +78,7 @@ spec:
               name: db-credenciais
               key: password
         ports:
-        - containerPort: 3306        # The port that the container exposes       
+        - containerPort: 3306          
           name: mysql
         resources:
           requests:
@@ -89,9 +88,9 @@ spec:
             memory: "1024Mi"
             cpu: "512m"
         volumeMounts:
-        - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
+        - name: mysql-persistent-storage  
           mountPath: /var/lib/mysql
-      volumes:                       # A PersistentVolume is mounted as a volume to the Pod  
+      volumes:                         
       - name: mysql-persistent-storage
         persistentVolumeClaim:
           claimName: mysql-pv-claim
