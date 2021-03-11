@@ -1,14 +1,76 @@
 apiVersion: v1
-kind: Service
+kind: PersistentVolumeClaim        
+metadata:                          
+  name: mysql-pv-claim
+  labels:
+    app: polling-app
+spec:                             
+  accessModes:
+    - ReadWriteOnce               
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1                    
+kind: Service                    
 metadata:
-  name: postgres-service
+  name: mysql        
+  labels:                         
+    app: mysql
 spec:
-  type: LoadBalancer 
   ports:
-    - name: postgres-service
-      protocol: TCP
-      port: 5432
+    - port: 3306
+  selector:                       
+    app: mysql
+---
+apiVersion: apps/v1
+kind: Deployment                  
+metadata:
+  name: mysql          
+  labels:                           
+    app: mysql
+spec:
   selector:
-    app: postgres-service
-    
-    ---
+    matchLabels:                   
+      app: mysql
+  strategy:
+    type: Recreate
+  template:                         
+    metadata:
+      labels:                      
+        app: mysql
+    spec:                           
+      containers:
+      - image: mysql:5.6            
+        name: mysql
+        env:                        
+        - name: MYSQL_ROOT_PASSWORD 
+          valueFrom:                
+            secretKeyRef:
+              name: mysql-root-pass
+              key: password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-db-url
+              key: database
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-pass
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-pass
+              key: password
+        ports:
+        - containerPort: 3306        # The port that the container exposes       
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
+          mountPath: /var/lib/mysql
+      volumes:                       # A PersistentVolume is mounted as a volume to the Pod  
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
