@@ -34,6 +34,7 @@ spec:
   externalName: mysql-brunoferreirag.cloud.okteto.net
   ports:
     - port: 3306
+  clusterIP: None
   selector:                       
     app: mysql
 ---
