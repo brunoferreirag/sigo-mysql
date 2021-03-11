@@ -30,7 +30,8 @@ metadata:
   labels:                         
     app: mysql
 spec:
-  type: NodePort
+  type: ExternalName
+  externalName: my.database.example.com
   ports:
     - port: 3306
       targetPort: 3306
