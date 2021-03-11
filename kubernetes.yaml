@@ -30,10 +30,11 @@ metadata:
   labels:                         
     app: mysql
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 3306
       targetPort: 3306
+      protocol: TCP
   selector:                       
     app: mysql
 ---
