@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -8,7 +9,7 @@ data:
   password: eTA5VGxxdHpPTlNoc3ptYVZ0Q0s=
   root-password: TSNARXN3UFB2QUBp
   database: dXN1YXJpb3M=
-----
+---
 apiVersion: v1
 kind: PersistentVolumeClaim        
 metadata:                          
