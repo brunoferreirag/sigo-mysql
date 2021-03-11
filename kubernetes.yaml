@@ -1,4 +1,15 @@
 apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credenciais
+type: Opaque
+data:
+  user: dTA0cWQ5YW5pN2U3bTFjdg==
+  password: eTA5VGxxdHpPTlNoc3ptYVZ0Q0s=
+  root-password: TSNARXN3UFB2QUBp
+  database: dXN1YXJpb3M=
+----
+apiVersion: v1
 kind: PersistentVolumeClaim        
 metadata:                          
   name: mysql-pv-claim
@@ -47,22 +58,22 @@ spec:
         - name: MYSQL_ROOT_PASSWORD 
           valueFrom:                
             secretKeyRef:
-              name: mysql-root-pass
-              key: password
+              name: db-credenciais
+              key: root-password
         - name: MYSQL_DATABASE
           valueFrom:
             secretKeyRef:
-              name: mysql-db-url
+              name: db-credenciais
               key: database
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
-              name: mysql-user-pass
-              key: username
+              name: db-credenciais
+              key: user
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-user-pass
+              name: db-credenciais
               key: password
         ports:
         - containerPort: 3306        # The port that the container exposes       
