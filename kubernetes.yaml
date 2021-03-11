@@ -30,6 +30,7 @@ metadata:
   labels:                         
     app: mysql
 spec:
+  type: LoadBalancer 
   ports:
     - port: 3306
   selector:                       
@@ -79,6 +80,13 @@ spec:
         ports:
         - containerPort: 3306        # The port that the container exposes       
           name: mysql
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "256m"
+          limits:
+            memory: "1024Mi"
+            cpu: "512m"
         volumeMounts:
         - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
           mountPath: /var/lib/mysql
