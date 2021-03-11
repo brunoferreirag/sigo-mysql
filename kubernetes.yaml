@@ -30,7 +30,7 @@ metadata:
   labels:                         
     app: mysql
 spec:
-  type: NodePort
+  type: ExternalName
   ports:
     - port: 3306
   selector:                       
