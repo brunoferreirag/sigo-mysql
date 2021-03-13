@@ -23,18 +23,15 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: v1                    
-kind: Service                    
+apiVersion: v1                   
+kind: Service                     
 metadata:
-  name: mysql        
-  labels:                         
+  name: mysql         
+  labels:                        
     app: mysql
 spec:
-  type: NodePort
   ports:
     - port: 3306
-      targetPort: 3306
-      protocol: TCP
   selector:                       
     app: mysql
 ---
