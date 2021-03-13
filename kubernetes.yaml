@@ -82,10 +82,10 @@ spec:
         resources:
           requests:
             memory: "512Mi"
-            cpu: "256m"
+            cpu: "128m"
           limits:
             memory: "1024Mi"
-            cpu: "512m"
+            cpu: "256m"
         volumeMounts:
         - name: mysql-persistent-storage  # This name should match the name specified in `volumes.name`
           mountPath: /var/lib/mysql
